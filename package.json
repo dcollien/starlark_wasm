@@ -1,8 +1,18 @@
 {
   "name": "starlark-wasm",
   "private": false,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
+  "main": "dist/starlark.cjs.js",
+  "module": "dist/starlark.es.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/starlark.es.js",
+      "require": "./dist/starlark.cjs.js",
+      "umd": "./dist/starlark.umd.js"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
