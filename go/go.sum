@@ -1,0 +1,4 @@
+go.starlark.net v0.0.0-20241125201518-c05ff208a98f h1:W+3pcCdjGognUT+oE6tXsC3xiCEcCYTaJBXHHRn7aW0=
+go.starlark.net v0.0.0-20241125201518-c05ff208a98f/go.mod h1:YKMCv9b1WrfWmeqdV5MAuEHWsu5iC+fe6kYl2sQjdI8=
+golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 h1:0A+M6Uqn+Eje4kHMK80dtF3JCXC4ykBgQG4Fe06QRhQ=
+golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=

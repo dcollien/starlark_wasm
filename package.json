@@ -1,0 +1,23 @@
+{
+  "name": "starlark-wasm",
+  "private": false,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "build-go": "cd go && GOOS=js GOARCH=wasm go build -ldflags \"-s -w\" -o ../public/starlark.wasm ./main.go",
+    "build-go-dev": "cd go && GOOS=js GOARCH=wasm go build -o ../public/starlark.wasm ./main.go",
+    "release": "rm -rf ./dist && npm run build-go && npm run build && npm publish --access public"
+  },
+  "files": [
+    "dist",
+    "public"
+  ],
+  "devDependencies": {
+    "typescript": "~5.6.2",
+    "vite": "^6.0.1",
+    "vite-plugin-dts": "^4.3.0"
+  }
+}

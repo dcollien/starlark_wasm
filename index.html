@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Starlark in the Browser</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      #app {
+        padding: 1em;
+      }
+      #console {
+        padding: 1em;
+        white-space: pre-wrap;
+        background-color: #444;
+        color: #eee;
+        width: 100%;
+      }
+      #return-value {
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.5em;
+
+        font-weight: bold;
+        font-size: small;
+      }
+
+      #files li {
+        cursor: pointer;
+        color: #007bff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div style="display: flex">
+        <div>
+          <ul id="files"></ul>
+          <button id="add-file">Add</button>
+        </div>
+        <div>
+          <div style="padding: 1em">
+            <div>
+              <input id="filename" type="text" readonly />
+            </div>
+            <textarea id="code" cols="40" rows="10"></textarea>
+          </div>
+        </div>
+        <div style="flex: auto">
+          <div>
+            <label>args:</label>
+            <textarea id="args" cols="30" rows="3">["Hello"]</textarea>
+          </div>
+          <div>
+            <label>kwargs:</label>
+            <textarea id="kwargs" cols="30" rows="3">
+{
+  "name": "starlark"
+}</textarea
+            >
+          </div>
+
+          <div>
+            <label>return value:</label>
+            <pre id="return-value"></pre>
+          </div>
+
+          <div>
+            <label>console:</label>
+            <pre id="console"></pre>
+          </div>
+        </div>
+      </div>
+      <button id="run">Run</button>
+    </div>
+    <script type="module">
+      import { Starlark } from "./dist/starlark.es.js";
+      const starlarkWasmPath = "/public/starlark.wasm"; // Adjust the path as needed
+
+      const app = document.getElementById("app");
+      const console = document.getElementById("console");
+      const argsElement = document.getElementById("args");
+      const kwargsElement = document.getElementById("kwargs");
+
+      const filenameElement = document.getElementById("filename");
+      const codeElement = document.getElementById("code");
+
+      const files = {
+        "main.star": `load("lib.star", "add")
+
+def hello(greeting, name="world"):
+    print(greeting + " " + name)
+    return add(40, 2)`,
+        "lib.star": `def add(a, b):
+    return a + b`,
+      };
+
+      const filesElement = document.getElementById("files");
+      const addFileButton = document.getElementById("add-file");
+
+      const selectFile = (filename) => {
+        filenameElement.value = filename;
+        codeElement.value = files[filename];
+      };
+
+      const updateFileList = () => {
+        filesElement.innerHTML = "";
+        for (const filename in files) {
+          const li = document.createElement("li");
+          li.textContent = filename;
+          filesElement.appendChild(li);
+
+          li.addEventListener("click", () => {
+            selectFile(filename);
+          });
+        }
+      };
+
+      const addEventListeners = () => {
+        addFileButton.addEventListener("click", () => {
+          const filename = prompt("Enter filename");
+
+          if (!filename) {
+            return;
+          }
+
+          files[filename] = "";
+          updateFileList();
+          selectFile(filename);
+        });
+
+        codeElement.addEventListener("input", () => {
+          files[filenameElement.value] = codeElement.value;
+        });
+      };
+
+      addEventListeners();
+      updateFileList();
+      selectFile("main.star");
+
+      Starlark.init(starlarkWasmPath);
+
+      const starlark = new Starlark({
+        load: (filename) => {
+          return files[filename];
+        },
+
+        print: (message) => {
+          console.textContent += message;
+        },
+      });
+
+      document.getElementById("run").addEventListener("click", async () => {
+        console.textContent = "";
+
+        const args = JSON.parse(argsElement.value);
+        const kwargs = JSON.parse(kwargsElement.value);
+
+        const returnValue = await starlark.run(
+          "main.star",
+          "hello",
+          args,
+          kwargs,
+          1
+        );
+
+        const returnValueElement = document.getElementById("return-value");
+        returnValueElement.textContent = JSON.stringify(returnValue);
+      });
+    </script>
+  </body>
+</html>
