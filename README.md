@@ -16,31 +16,31 @@ def hello_world(name):
     return 42`;
 
 // load the wasm module
-Starlark.init(wasmUrl);
+Starlark.init(wasmUrl).then(async () => {
+  // instantiate a new starlark runtime, defining a load and print function
+  const starlark = new Starlark({
+    // load gives you module loading
+    load: async (filename) => {
+      const files = {
+        "main.star": exampleCode,
+      };
+      return files[filename];
+    },
 
-// instantiate a new starlark runtime, defining a load and print function
-const starlark = new Starlark({
-  // load gives you module loading
-  load: async (filename) => {
-    const files = {
-      "main.star": exampleCode,
-    };
-    return files[filename];
-  },
+    // print to a console
+    print: (message) => {
+      console.log(message);
+    },
+  });
 
-  // print to a console
-  print: (message) => {
-    console.log(message);
-  },
+  const returnValue = await starlark.run(
+    "main.star", // the file to run
+    "hello_world", // the function to call
+    ["starlark"], // the args for the function
+    {}, // the kwargs for the function
+    1 // maximum execution seconds before timeout
+  );
 });
-
-const returnValue = await starlark.run(
-  "main.star", // the file to run
-  "hello_world", // the function to call
-  ["starlark"], // the args for the function
-  {}, // the kwargs for the function
-  1 // maximum execution seconds before timeout
-);
 ```
 
 ## Project Structure
