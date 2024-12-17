@@ -8,8 +8,7 @@ A typescript library for running starlark-go in the browser using WebAssembly.
 
 ```typescript
 import { Starlark } from "starlark-wasm";
-
-const starlarkWasmPath = "/public/starlark.wasm";
+import wasmUrl from "starlark-wasm/wasm?url";
 
 const exampleCode = `
 def hello_world(name):
@@ -17,12 +16,12 @@ def hello_world(name):
     return 42`;
 
 // load the wasm module
-Starlark.init(starlarkWasmPath);
+Starlark.init(wasmUrl);
 
 // instantiate a new starlark runtime, defining a load and print function
 const starlark = new Starlark({
   // load gives you module loading
-  load: (filename) => {
+  load: async (filename) => {
     const files = {
       "main.star": exampleCode,
     };
